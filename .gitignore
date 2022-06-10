@@ -1,0 +1,12 @@
+vendor
+config.php
+web/files/static/pdf
+web/files/xml
+web/bundles/*
+web/ckeditor/*
+tmp
+phpunit.xml
+web/files/reports
+.tmp_staging
+.idea
+src/cache/
