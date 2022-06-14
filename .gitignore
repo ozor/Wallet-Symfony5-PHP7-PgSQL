@@ -10,3 +10,4 @@ web/files/reports
 .tmp_staging
 .idea
 src/cache/
+.env

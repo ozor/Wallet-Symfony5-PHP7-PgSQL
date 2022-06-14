@@ -1,0 +1,62 @@
+version: "3.3"
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: wallet-nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 8585:80
+      - 4443:443
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+      - ./docker/nginx/log:/var/log/nginx/
+    working_dir: /var/www
+    depends_on:
+      - php
+    networks:
+      - wallet-network
+
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+      args:
+        COMPOSER_TOKEN: $COMPOSER_TOKEN
+    container_name: wallet-php
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - .:/var/www
+    working_dir: /var/www
+    environment:
+#      XDEBUG_CONFIG: "remote_host=192.168.221.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=localhost"
+    networks:
+      - wallet-network
+
+  postgres:
+    image: postgres:latest
+    container_name: wallet-postgres
+    restart: on-failure
+    ports:
+      - 5434:5432
+    environment:
+      TZ: Europe/Moscow
+      PGTZ: Europe/Moscow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data/
+    networks:
+      - wallet-network
+
+volumes:
+  postgres-volume: ~
+
+networks:
+  wallet-network:
+    driver: bridge
